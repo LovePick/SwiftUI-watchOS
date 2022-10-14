@@ -62,81 +62,96 @@ struct ContentView: View {
             save()
         }
     }
-    // MARK: - BODY
-    var body: some View {
-        VStack {
-            HStack(alignment: .center, spacing: 6) {
-                TextField("Add New Note", text: $text)
+    
+    // MARK: - Component
+    func navigationLinkWith(noteIndex:Int) -> some View{
+        return NavigationLink {
+            DetailView(note: notes[noteIndex], count: notes.count, index: noteIndex)
+        } label: {
+            HStack{
+                Capsule()
+                    .frame(width: 4)
+                    .foregroundColor(.accentColor)
                 
-                Button {
-                    // ACTION
-                    // 1. Only run the button's action when the text field is not empty
-                    guard text.isEmpty == false else { return }
-                    
-                    // 2. Create a new note item and initialize it with the text value
-                    let note = Note(id: UUID(), text: text)
-                    
-                    // 3. Add the new note item to the notes array (append)
-                    notes.append(note)
-                    
-                    // 4. Make the text field empty
-                    text = ""
-                    
-                    // 5. Save the note (function)
-                    save()
-                    
-                } label: {
-                    Image(systemName: "plus.circle")
-                        .font(.system(size: 42, weight: .semibold))
-                }
-                .fixedSize()
-                .buttonStyle(PlainButtonStyle())
-                .foregroundColor(.accentColor)
-                //                .buttonStyle(BorderedButtonStyle(tint: .accentColor))
-                
-                
+                Text(notes[noteIndex].text)
+                    .lineLimit(lineCount)
+                    .padding(.leading, 5)
                 
             }//: HSTACK
-            
-            Spacer()
-            
-            if notes.count >= 1 {
-                List {
-                    ForEach(0..<notes.count, id: \.self) { i in
-                        //Work only device
-                        NavigationLink(destination:
-                            DetailView(note: notes[i], count: notes.count, index: i)
-                        ){
-                            HStack{
-                                Capsule()
-                                    .frame(width: 4)
-                                    .foregroundColor(.accentColor)
-                                
-                                Text(notes[i].text)
-                                    .lineLimit(lineCount)
-                                    .padding(.leading, 5)
-                                
-                            }//: HSTACK
-                        }//: NAVIGATION LINK
-                    }//: LOOP
-                    .onDelete(perform: delete)
-                }//: LIST
-            }else{
+        }
+        
+    }
+    // MARK: - BODY
+    var body: some View {
+        NavigationView {
+            VStack {
+                
+                HStack(alignment: .center, spacing: 6) {
+                    TextField("Add New Note", text: $text)
+                    
+                    Button {
+                        // ACTION
+                        // 1. Only run the button's action when the text field is not empty
+                        guard text.isEmpty == false else { return }
+                        
+                        // 2. Create a new note item and initialize it with the text value
+                        let note = Note(id: UUID(), text: text)
+                        
+                        // 3. Add the new note item to the notes array (append)
+                        notes.append(note)
+                        
+                        // 4. Make the text field empty
+                        text = ""
+                        
+                        // 5. Save the note (function)
+                        save()
+                        
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .font(.system(size: 42, weight: .semibold))
+                    }
+                    .fixedSize()
+                    .buttonStyle(PlainButtonStyle())
+                    .foregroundColor(.accentColor)
+                    //                .buttonStyle(BorderedButtonStyle(tint: .accentColor))
+                    
+                    
+                    
+                }//: HSTACK
+                
                 Spacer()
-                Image(systemName: "note.text")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(.gray)
-                    .opacity(0.25)
-                    .padding(25)
-                Spacer()
-            }
-            
-        }//: VSTACK
-        .navigationTitle("Notes")
+                
+                if notes.count >= 1 {
+                    
+                    List {
+                        ForEach(0..<notes.count, id: \.self) { i in
+                            
+                            navigationLinkWith(noteIndex: i)
+                            
+                        }//: LOOP
+                        .onDelete(perform: delete)
+                    }//: LIST
+                }else{
+                    Spacer()
+                    Image(systemName: "note.text")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.gray)
+                        .opacity(0.25)
+                        .padding(25)
+                    Spacer()
+                }
+                
+            }//: VSTACK
+            .navigationTitle("Notes")
+            .navigationBarTitleDisplayMode(.inline)
+          
+        }//: NAVIGATION VIEW
         .onAppear {
             load()
         }
+
+        
     }
 }
 
